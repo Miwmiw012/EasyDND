@@ -71,6 +71,43 @@ button:focus-visible{outline:2px solid #fff;outline-offset:3px}
 @media(max-width:460px){header{padding-top:14px}header h1{letter-spacing:-1px}#loginPanel .row{display:grid;grid-template-columns:minmax(0,1fr)}#loginPanel .row button{width:100%}#homePanel .row{display:grid;grid-template-columns:minmax(0,1fr)}#homePanel .row button{width:100%}.panel{border-radius:15px}.portrait-editor{grid-template-columns:78px minmax(0,1fr)}.portrait-preview-wrap{width:78px;height:90px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation:none!important;transition:none!important}}
 
+#dicePanel .field-label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+#dicePanel .dice {
+  margin-top: 8px;
+}
+
+#dicePanel .dice button:disabled {
+  opacity: .45;
+  cursor: wait;
+}
+
+#dicePanel .result {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  min-height: 36px;
+}
+
+#dicePanel .result.rolling {
+  color: var(--accent);
+  animation: dicePulse .65s ease-in-out infinite alternate;
+}
+
+@keyframes dicePulse {
+  from { opacity: .55; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #dicePanel .result.rolling {
+    animation: none;
+  }
+}
+
+
 </style>
 </head><body><main>
 <header><h1>🎲 EasyDND</h1><div class="muted">โต๊ะเล่น Dungeons & Dragons ออนไลน์</div></header>
