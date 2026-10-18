@@ -100,19 +100,21 @@ By MZNR
     if (status) status.textContent = "กำลังเชื่อมต่อ Firebase...";
 
     try {
-      await signInAnonymously(auth);
+  await signInAnonymously(auth);
 
-      if (status).textContent =
-  "✓ เชื่อมต่อ Firebase แล้ว\nรหัสผู้เล่น: " + auth.currentUser.uid;
+  if (status) {
+    status.textContent =
+      "✓ เชื่อมต่อ Firebase แล้ว\nรหัสผู้เล่น: " + auth.currentUser.uid;
+  }
 
-      console.log("Firebase connected. UID:", auth.currentUser.uid);
-    } catch (error) {
-      console.error("Firebase error:", error);
+  console.log("Firebase connected. UID:", auth.currentUser.uid);
+} catch (error) {
+  console.error("Firebase error:", error);
 
-      if (status) {
-        status.textContent = "เชื่อมต่อไม่สำเร็จ: " + error.code;
-      }
-    }
+  if (status) {
+    status.textContent = "เชื่อมต่อไม่สำเร็จ: " + error.code;
+  }
+}
   }
 
   startFirebase();
