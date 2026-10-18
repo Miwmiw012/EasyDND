@@ -2,492 +2,357 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#111019">
-  <title>EasyDND — Enter the Realm</title>
-
-  <style>
-    * { box-sizing: border-box; }
-
-    :root {
-      --gold: #e9c77e;
-      --gold-light: #ffe7ac;
-      --bg: #111019;
-      --panel: #1b1926;
-      --muted: #aaa6ba;
-      --line: #403749;
-    }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background:
-        radial-gradient(ellipse at 50% 0%, #40304c 0%, transparent 52%),
-        radial-gradient(ellipse at 100% 100%, #24243b 0%, transparent 40%),
-        var(--bg);
-      color: #f7f1e8;
-      font-family: system-ui, sans-serif;
-    }
-
-    button, input { font: inherit; }
-
-    .page {
-      width: min(100% - 32px, 760px);
-      margin: auto;
-      padding: 30px 0 36px;
-    }
-
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 48px;
-    }
-
-    .brand {
-      color: var(--gold);
-      font-weight: 900;
-      font-size: 20px;
-      letter-spacing: 1px;
-    }
-
-    .brand small {
-      display: block;
-      color: var(--muted);
-      font-size: 10px;
-      letter-spacing: 3px;
-      font-weight: 500;
-      margin-top: 3px;
-    }
-
-    .online {
-      border: 1px solid #47634f;
-      background: #1c3028;
-      color: #a7e7b8;
-      border-radius: 30px;
-      padding: 7px 10px;
-      font-size: 11px;
-      white-space: nowrap;
-    }
-
-    .hero {
-      text-align: center;
-      margin-bottom: 34px;
-    }
-
-    .crest {
-      width: 92px;
-      height: 92px;
-      margin: 0 auto 20px;
-      display: grid;
-      place-items: center;
-      font-size: 48px;
-      color: var(--gold);
-      border: 1px solid #8c7047;
-      border-radius: 28px 28px 40px 40px;
-      background: linear-gradient(145deg, #3b2e40, #191622);
-      box-shadow: 0 0 42px #d7ae4820, inset 0 0 20px #e8c77a12;
-    }
-
-    .eyebrow {
-      color: var(--gold);
-      font-size: 11px;
-      letter-spacing: 4px;
-      font-weight: 800;
-    }
-
-    h1 {
-      font-family: Georgia, serif;
-      font-size: clamp(36px, 9vw, 56px);
-      line-height: 1.12;
-      margin: 12px 0;
-      letter-spacing: 1px;
-    }
-
-    h1 span { color: var(--gold); }
-
-    .intro {
-      max-width: 430px;
-      margin: auto;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.9;
-    }
-
-    .divider {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      color: #8f7b61;
-      font-size: 11px;
-      letter-spacing: 3px;
-      margin: 32px 0 18px;
-    }
-
-    .divider::before, .divider::after {
-      content: "";
-      height: 1px;
-      flex: 1;
-      background: linear-gradient(90deg, transparent, var(--line));
-    }
-
-    .divider::after {
-      background: linear-gradient(90deg, var(--line), transparent);
-    }
-
-    .actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-    }
-
-    .action {
-      text-align: left;
-      padding: 20px 16px;
-      min-height: 185px;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      background: linear-gradient(145deg, #252130, #191722);
-      color: #f7f1e8;
-      cursor: pointer;
-      transition: transform .18s, border-color .18s;
-    }
-
-    .action:hover {
-      transform: translateY(-3px);
-      border-color: var(--gold);
-    }
-
-    .action.primary {
-      border-color: #8d7045;
-      background: linear-gradient(145deg, #44342e, #211c25 80%);
-    }
-
-    .action-icon {
-      font-size: 30px;
-      margin-bottom: 15px;
-    }
-
-    .action h2 {
-      font-size: 17px;
-      margin: 0 0 8px;
-    }
-
-    .action p {
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.8;
-      margin: 0;
-    }
-
-    .arrow {
-      display: block;
-      color: var(--gold);
-      font-size: 20px;
-      margin-top: 12px;
-    }
-
-    .features {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-top: 28px;
-    }
-
-    .feature {
-      text-align: center;
-      padding: 15px 6px;
-      border: 1px solid #302c3c;
-      border-radius: 12px;
-      background: #1a1823a8;
-    }
-
-    .feature div { font-size: 23px; }
-
-    .feature span {
-      display: block;
-      color: #c3bdcf;
-      font-size: 11px;
-      margin-top: 8px;
-    }
-
-    .status {
-      text-align: center;
-      padding: 12px;
-      margin-top: 24px;
-      border: 1px solid #344a3d;
-      background: #1a2b24;
-      color: #a9e6be;
-      border-radius: 10px;
-      font-size: 12px;
-      overflow-wrap: anywhere;
-      line-height: 1.8;
-    }
-
-    .status.error {
-      color: #ffb9b9;
-      background: #351f27;
-      border-color: #693d49;
-    }
-
-    .uid {
-      color: #c2bdcd;
-      font-size: 10px;
-      margin-top: 5px;
-      overflow-wrap: anywhere;
-    }
-
-    footer {
-      text-align: center;
-      color: #777184;
-      font-size: 11px;
-      margin-top: 30px;
-      line-height: 1.9;
-    }
-
-    .modal {
-      position: fixed;
-      inset: 0;
-      z-index: 10;
-      display: none;
-      place-items: center;
-      padding: 20px;
-      background: #08070dcc;
-    }
-
-    .modal.open { display: grid; }
-
-    .modal-card {
-      width: min(100%, 420px);
-      padding: 24px;
-      border: 1px solid #786044;
-      border-radius: 18px;
-      background: #211d2a;
-      box-shadow: 0 20px 80px #0009;
-    }
-
-    .modal-card h2 {
-      color: var(--gold);
-      margin: 0 0 10px;
-    }
-
-    .modal-card p {
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.8;
-    }
-
-    .modal-card input {
-      width: 100%;
-      padding: 13px;
-      margin: 8px 0;
-      border: 1px solid #51475d;
-      border-radius: 9px;
-      background: #14121b;
-      color: white;
-      outline-color: var(--gold);
-    }
-
-    .modal-card button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 10px;
-      border: 0;
-      border-radius: 9px;
-      cursor: pointer;
-      font-weight: 700;
-    }
-
-    .confirm {
-      color: #20180d;
-      background: var(--gold);
-    }
-
-    .cancel {
-      color: #ddd5e6;
-      background: #373140;
-    }
-
-    @media (max-width: 430px) {
-      .page { padding-top: 22px; }
-      header { margin-bottom: 38px; }
-      .actions { gap: 10px; }
-      .action { padding: 15px 12px; min-height: 180px; }
-      .action h2 { font-size: 15px; }
-      .features { gap: 7px; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#15121e">
+<title>EasyDND</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#15121e;color:#f5eddf;font:16px system-ui,sans-serif}
+main{max-width:650px;margin:auto;padding:24px 16px}
+h1,h2{color:#e9c77e}
+.card{background:#25202f;border:1px solid #504158;border-radius:14px;padding:18px;margin:14px 0}
+button,input{font:inherit;padding:12px;border-radius:8px}
+button{border:0;background:#e9c77e;color:#211927;font-weight:bold;cursor:pointer}
+button:disabled{opacity:.5;cursor:wait}
+input{width:100%;margin:8px 0;background:#17131f;color:white;border:1px solid #67546f}
+.muted{color:#c2b8cc;font-size:13px;line-height:1.7;overflow-wrap:anywhere}
+.status{padding:12px;background:#1c3028;border:1px solid #47634f;border-radius:10px;overflow-wrap:anywhere}
+.error{background:#351f27;border-color:#8b4856;color:#ffc4c4}
+.hidden{display:none!important}
+.code{font-size:28px;letter-spacing:3px;color:#e9c77e;font-weight:bold;overflow-wrap:anywhere}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.actions button{margin-top:8px}
+</style>
 </head>
-
 <body>
-  <div class="page">
-    <header>
-      <div class="brand">
-        ⚔ EasyDND
-        <small>BY MZNR</small>
-      </div>
-      <div class="online" id="connection">● กำลังเชื่อมต่อ</div>
-    </header>
+<main>
+<h1>⚔ EasyDND</h1>
+<p class="muted">Your adventure begins.</p>
 
-    <section class="hero">
-      <div class="crest">⚔</div>
-      <div class="eyebrow">YOUR ADVENTURE BEGINS</div>
-      <h1>Enter the <span>Realm</span></h1>
-      <p class="intro">
-        ทุกตำนานเริ่มต้นจากการทอยลูกเต๋าเพียงครั้งเดียว<br>
-        สร้างโลกของคุณ แล้วออกผจญภัยไปพร้อมกับพวกพ้อง
-      </p>
-    </section>
+<div id="status" class="status">กำลังเชื่อมต่อ Firebase...</div>
+<p id="uid" class="muted"></p>
 
-    <div class="divider">CHOOSE YOUR PATH</div>
+<section id="home">
+<div class="card">
+<h2>👑 สร้างห้องเกม</h2>
+<p class="muted">สร้างแคมเปญใหม่ คุณจะเป็น Dungeon Master</p>
+<input id="newName" maxlength="40" placeholder="ชื่อแคมเปญ">
+<button id="createBtn" disabled>สร้างห้องเกม</button>
+</div>
 
-    <section class="actions">
-      <button class="action primary" onclick="openModal('create')">
-        <div class="action-icon">👑</div>
-        <h2>สร้างห้องเกม</h2>
-        <p>สร้างแคมเปญของคุณเอง<br>รับบท Dungeon Master</p>
-        <span class="arrow">↗</span>
-      </button>
+<div class="card">
+<h2>🗝️ เข้าร่วมห้องเกม</h2>
+<p class="muted">กรอกรหัส 8 ตัวที่ DM ส่งให้</p>
+<input id="joinCode" maxlength="8" placeholder="รหัสห้อง">
+<button id="joinBtn" disabled>ขอเข้าร่วมห้อง</button>
+</div>
+</section>
 
-      <button class="action" onclick="openModal('join')">
-        <div class="action-icon">🗝️</div>
-        <h2>เข้าร่วมห้องเกม</h2>
-        <p>มีรหัสห้องอยู่แล้วใช่ไหม<br>เข้าร่วมการผจญภัยได้เลย</p>
-        <span class="arrow">↗</span>
-      </button>
-    </section>
+<section id="room" class="card hidden">
+<p id="role" class="muted"></p>
+<h2 id="roomName"></h2>
+<p class="muted">รหัสห้อง</p>
+<div id="roomCode" class="code"></div>
+<div class="actions">
+<button id="copyBtn">คัดลอกรหัส</button>
+<button id="homeBtn">กลับหน้าหลัก</button>
+</div>
+<p id="roomStatus" class="muted"></p>
+<section id="requests" class="hidden">
+<h2>คำขอเข้าร่วม</h2>
+<div id="requestList"></div>
+</section>
+</section>
 
-    <section class="features">
-      <div class="feature">
-        <div>🗺️</div>
-        <span>แผนที่และโทเคน</span>
-      </div>
-      <div class="feature">
-        <div>🎲</div>
-        <span>ลูกเต๋า 9 แบบ</span>
-      </div>
-      <div class="feature">
-        <div>📜</div>
-        <span>ชีทตัวละคร</span>
-      </div>
-    </section>
+<p class="muted">EasyDND · Virtual Tabletop</p>
+</main>
 
-    <div class="status" id="status">
-      กำลังเตรียมระบบ...
-      <div class="uid" id="uid"></div>
-    </div>
+<script type="module">
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+import { getAuth, signInAnonymously }
+from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+import {
+ getDatabase, ref, get, set, remove, onValue
+} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-database.js";
 
-    <footer>
-      EASYDND · VIRTUAL TABLETOP<br>
-      Forged for adventures, bound by imagination.
-    </footer>
-  </div>
+const firebaseConfig = {
+ apiKey: "AIzaSyApLGFjitTleBjPCbaHgL2QZ1Bxdw2uYlY",
+ authDomain: "easydnd-1ab42.firebaseapp.com",
+ databaseURL: "https://easydnd-1ab42-default-rtdb.asia-southeast1.firebasedatabase.app",
+ projectId: "easydnd-1ab42",
+ storageBucket: "easydnd-1ab42.firebasestorage.app",
+ messagingSenderId: "755955885657",
+ appId: "1:755955885657:web:5aceef5392db3b98673348",
+ measurementId: "G-JVV8WY0BXT"
+};
 
-  <div class="modal" id="modal" role="dialog" aria-modal="true">
-    <div class="modal-card">
-      <h2 id="modalTitle">สร้างห้องเกม</h2>
-      <p id="modalDescription">
-        ตั้งชื่อแคมเปญของคุณ
-      </p>
-      <input id="roomInput" maxlength="40"
-        placeholder="ชื่อแคมเปญ">
-      <button class="confirm" onclick="submitRoom()">
-        ดำเนินการต่อ
-      </button>
-      <button class="cancel" onclick="closeModal()">
-        กลับหน้าหลัก
-      </button>
-      <p id="modalNote">
-        ระบบห้องเกมกำลังอยู่ระหว่างการพัฒนา
-      </p>
-    </div>
-  </div>
+const $ = id => document.getElementById(id);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
 
-  <script>
-    let modalMode = "create";
+let currentRoom = null;
+let listeners = [];
+let busy = false;
 
-    function openModal(mode) {
-      modalMode = mode;
-      document.getElementById("modalTitle").textContent =
-        mode === "create" ? "⚔ สร้างห้องเกม" : "🗝 เข้าร่วมห้องเกม";
+function setStatus(text, error = false) {
+ $("status").textContent = text;
+ $("status").classList.toggle("error", error);
+}
 
-      document.getElementById("modalDescription").textContent =
-        mode === "create"
-          ? "ตั้งชื่อแคมเปญที่คุณจะเป็น DM"
-          : "กรอกรหัสห้องที่ DM ส่งให้คุณ";
+function stopListeners() {
+ listeners.forEach(unsubscribe => unsubscribe());
+ listeners = [];
+}
 
-      const input = document.getElementById("roomInput");
-      input.value = "";
-      input.placeholder =
-        mode === "create" ? "ชื่อแคมเปญ" : "รหัสห้องเกม";
+function makeCode() {
+ const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+ let result = "";
+ for (let i = 0; i < 8; i++) {
+  result += chars[Math.floor(Math.random() * chars.length)];
+ }
+ return result;
+}
 
-      document.getElementById("modalNote").textContent =
-        "หน้าจอนี้เป็นส่วนติดต่อเบื้องต้น ยังไม่ได้สร้างหรือเข้าร่วมห้องจริง";
+function showRoom(id, info, role) {
+ stopListeners();
+ currentRoom = id;
+ $("home").classList.add("hidden");
+ $("room").classList.remove("hidden");
+ $("roomName").textContent = info.name;
+ $("roomCode").textContent = id;
+ $("role").textContent =
+  role === "dm" ? "👑 คุณเป็น DM ของห้องนี้" : "🧙 ผู้เล่น";
+ $("requests").classList.toggle("hidden", role !== "dm");
+ $("roomStatus").textContent =
+  role === "dm"
+   ? "ส่งรหัสห้องให้เพื่อนเพื่อให้ส่งคำขอเข้าร่วม"
+   : "กำลังตรวจสอบสถานะสมาชิก";
 
-      document.getElementById("modal").classList.add("open");
-    }
+ const memberRef = ref(
+  db, `rooms/${id}/members/${auth.currentUser.uid}`
+ );
 
-    function closeModal() {
-      document.getElementById("modal").classList.remove("open");
-    }
+ listeners.push(onValue(memberRef, snap => {
+  if (role === "player" && snap.exists()) {
+   $("roomStatus").textContent = "DM อนุมัติให้เข้าห้องแล้ว";
+  }
+ }, error => {
+  $("roomStatus").textContent =
+   "อ่านสถานะสมาชิกไม่ได้: " + error.message;
+ }));
 
-    function submitRoom() {
-      const value = document.getElementById("roomInput").value.trim();
+ if (role !== "dm") return;
 
-      if (!value) {
-        document.getElementById("modalNote").textContent =
-          modalMode === "create"
-            ? "กรุณาตั้งชื่อแคมเปญก่อน"
-            : "กรุณากรอกรหัสห้องก่อน";
-        return;
-      }
+ const requestRef = ref(db, `rooms/${id}/joinRequests`);
 
-      document.getElementById("modalNote").textContent =
-        "รับข้อมูลแล้ว แต่ระบบห้องเกมยังไม่ได้เชื่อมกับฐานข้อมูล กรุณารอขั้นตอนพัฒนาถัดไป";
-    }
-  </script>
+ listeners.push(onValue(requestRef, snap => {
+  const list = $("requestList");
+  list.replaceChildren();
 
-  <script type="module">
-    import { initializeApp }
-      from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+  const requests = snap.val() || {};
+  const entries = Object.entries(requests);
 
-    import {
-      getAuth,
-      signInAnonymously
-    } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+  if (entries.length === 0) {
+   list.textContent = "ยังไม่มีคำขอเข้าร่วม";
+   return;
+  }
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyApLGFjitTleBjPCbaHgL2QZ1Bxdw2uYlY",
-      authDomain: "easydnd-1ab42.firebaseapp.com",
-      databaseURL: "https://easydnd-1ab42-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "easydnd-1ab42",
-      storageBucket: "easydnd-1ab42.firebasestorage.app",
-      messagingSenderId: "755955885657",
-      appId: "1:755955885657:web:5aceef5392db3b98673348",
-      measurementId: "G-JVV8WY0BXT"
-    };
+  for (const [uid] of entries) {
+   const card = document.createElement("div");
+   card.className = "card";
 
-    const status = document.getElementById("status");
-    const uid = document.getElementById("uid");
-    const connection = document.getElementById("connection");
+   const label = document.createElement("p");
+   label.textContent = "ผู้เล่น " + uid.slice(0, 10);
 
+   const approve = document.createElement("button");
+   approve.textContent = "อนุมัติ";
+   approve.onclick = async () => {
     try {
-      const app = initializeApp(firebaseConfig);
-      const auth = getAuth(app);
-      await signInAnonymously(auth);
-
-      status.firstChild.textContent = "✓ เชื่อมต่อ Firebase สำเร็จ";
-      uid.textContent = "รหัสผู้เล่น: " + auth.currentUser.uid;
-      connection.textContent = "● เชื่อมต่อแล้ว";
-    } catch (error) {
-      status.classList.add("error");
-      status.firstChild.textContent =
-        "เชื่อมต่อ Firebase ไม่สำเร็จ: " + error.code;
-      connection.textContent = "● ยังไม่เชื่อมต่อ";
-      console.error("Firebase error:", error);
+     await set(
+      ref(db, `rooms/${id}/members/${uid}`),
+      { uid, role: "player", joinedAt: Date.now() }
+     );
+     await remove(
+      ref(db, `rooms/${id}/joinRequests/${uid}`)
+     );
+     setStatus("อนุมัติผู้เล่นเรียบร้อย");
+    } catch (e) {
+     setStatus("อนุมัติไม่สำเร็จ: " + e.message, true);
     }
-  </script>
+   };
+
+   const deny = document.createElement("button");
+   deny.textContent = "ปฏิเสธ";
+   deny.style.marginLeft = "8px";
+   deny.onclick = async () => {
+    try {
+     await remove(
+      ref(db, `rooms/${id}/joinRequests/${uid}`)
+     );
+    } catch (e) {
+     setStatus("ปฏิเสธไม่สำเร็จ: " + e.message, true);
+    }
+   };
+
+   card.append(label, approve, deny);
+   list.append(card);
+  }
+ }, error => {
+  setStatus("อ่านคำขอไม่ได้: " + error.message, true);
+ }));
+}
+
+$("createBtn").addEventListener("click", async () => {
+ if (busy) return;
+ const name = $("newName").value.trim();
+
+ if (!name) {
+  setStatus("กรุณาพิมพ์ชื่อแคมเปญก่อน", true);
+  $("newName").focus();
+  return;
+ }
+
+ busy = true;
+ $("createBtn").disabled = true;
+ setStatus("กำลังสร้างห้องเกม...");
+
+ try {
+  let id = null;
+
+  for (let i = 0; i < 5; i++) {
+   const candidate = makeCode();
+   const check = await get(ref(db, `rooms/${candidate}/info`));
+   if (!check.exists()) {
+    id = candidate;
+    break;
+   }
+  }
+
+  if (!id) throw new Error("สร้างรหัสห้องไม่สำเร็จ");
+
+  const info = {
+   name: name.slice(0, 40),
+   ownerUid: auth.currentUser.uid,
+   createdAt: Date.now()
+  };
+
+  await set(ref(db, `rooms/${id}/info`), info);
+
+  await set(
+   ref(db, `rooms/${id}/members/${auth.currentUser.uid}`),
+   {
+    uid: auth.currentUser.uid,
+    role: "dm",
+    joinedAt: Date.now()
+   }
+  );
+
+  showRoom(id, info, "dm");
+  setStatus("✓ สร้างห้องสำเร็จ");
+ } catch (e) {
+  setStatus(
+   "สร้างห้องไม่สำเร็จ: " + (e.code || e.message),
+   true
+  );
+ } finally {
+  busy = false;
+  $("createBtn").disabled = false;
+ }
+});
+
+$("joinBtn").addEventListener("click", async () => {
+ if (busy) return;
+
+ const id = $("joinCode").value.trim().toUpperCase();
+
+ if (!/^[A-HJ-NP-Z2-9]{8}$/.test(id)) {
+  setStatus("รหัสห้องต้องมี 8 ตัว กรุณาตรวจสอบอีกครั้ง", true);
+  return;
+ }
+
+ busy = true;
+ $("joinBtn").disabled = true;
+ setStatus("กำลังค้นหาห้อง...");
+
+ try {
+  const infoSnap = await get(ref(db, `rooms/${id}/info`));
+
+  if (!infoSnap.exists()) {
+   throw new Error("ไม่พบห้องนี้ กรุณาตรวจสอบรหัสห้อง");
+  }
+
+  const info = infoSnap.val();
+  const uid = auth.currentUser.uid;
+  const memberRef = ref(db, `rooms/${id}/members/${uid}`);
+  const memberSnap = await get(memberRef);
+
+  if (memberSnap.exists()) {
+   showRoom(id, info, memberSnap.val().role);
+   setStatus("✓ คุณเป็นสมาชิกห้องนี้อยู่แล้ว");
+   return;
+  }
+
+  await set(
+   ref(db, `rooms/${id}/joinRequests/${uid}`),
+   {
+    uid,
+    displayName: "ผู้เล่น",
+    requestedAt: Date.now()
+   }
+  );
+
+  showRoom(id, info, "player");
+  $("roomStatus").textContent = "ส่งคำขอแล้ว รอ DM อนุมัติ";
+  setStatus("✓ ส่งคำขอเข้าร่วมแล้ว");
+ } catch (e) {
+  setStatus(
+   "เข้าร่วมห้องไม่สำเร็จ: " + (e.code || e.message),
+   true
+  );
+ } finally {
+  busy = false;
+  $("joinBtn").disabled = false;
+ }
+});
+
+$("copyBtn").addEventListener("click", async () => {
+ if (!currentRoom) return;
+
+ try {
+  await navigator.clipboard.writeText(currentRoom);
+  $("roomStatus").textContent = "คัดลอกรหัสห้องแล้ว";
+ } catch {
+  $("roomStatus").textContent = "รหัสห้องของคุณคือ: " + currentRoom;
+ }
+});
+
+$("homeBtn").addEventListener("click", () => {
+ stopListeners();
+ currentRoom = null;
+ $("room").classList.add("hidden");
+ $("home").classList.remove("hidden");
+});
+
+async function start() {
+ try {
+  await signInAnonymously(auth);
+  $("uid").textContent =
+   "รหัสผู้เล่น: " + auth.currentUser.uid;
+  $("createBtn").disabled = false;
+  $("joinBtn").disabled = false;
+  setStatus("✓ เชื่อมต่อ Firebase สำเร็จ พร้อมใช้งาน");
+ } catch (e) {
+  setStatus(
+   "เชื่อมต่อ Firebase ไม่สำเร็จ: " + (e.code || e.message),
+   true
+  );
+ }
+}
+
+start();
+</script>
 </body>
 </html>
