@@ -181,8 +181,78 @@ function compressPortrait(file){return new Promise((resolve,reject)=>{if(!file||
 async function saveCharacterSheet(){const uid=myRole==="dm"?(editingSheetUid||me.uid):me.uid;if(uid!==me.uid&&myRole!=="dm"){alert("แก้ไขได้เฉพาะใบตัวละครของตัวเอง");return}const customData={};document.querySelectorAll("[data-custom-field]").forEach(el=>customData[el.dataset.customField]=el.value.slice(0,500));const d={uid,characterName:$("sheetCharacterName").value.trim().slice(0,60),race:$("sheetRace").value.trim().slice(0,40),className:$("sheetClass").value.trim().slice(0,40),level:Math.max(1,Math.min(20,Number($("sheetLevel").value)||1)),hp:$("sheetHp").value.trim().slice(0,20),ac:$("sheetAc").value===""?"":Math.max(0,Math.min(99,Number($("sheetAc").value)||0)),speed:$("sheetSpeed").value.trim().slice(0,30),str:$("sheetStr").value===""?"":Number($("sheetStr").value),dex:$("sheetDex").value===""?"":Number($("sheetDex").value),con:$("sheetCon").value===""?"":Number($("sheetCon").value),int:$("sheetInt").value===""?"":Number($("sheetInt").value),wis:$("sheetWis").value===""?"":Number($("sheetWis").value),cha:$("sheetCha").value===""?"":Number($("sheetCha").value),notes:$("sheetNotes").value.slice(0,5000),portrait:currentPortrait,templateId:$("sheetTemplateSelect").value||"dnd5e",customData,updatedAt:Date.now(),updatedBy:me.uid};try{await set(dbref(`rooms/${roomId}/game/characterSheets/${uid}`),d);$("sheetStatus").textContent="บันทึกใบตัวละครแล้ว"}catch(e){alert("บันทึกใบตัวละครไม่ได้: "+errorText(e))}}
 async function saveCustomTemplate(){if(myRole!=="dm")return;const name=$("templateName").value.trim().slice(0,40),fields=$("templateFields").value.split(",").map(x=>x.trim().slice(0,40)).filter(Boolean).slice(0,12);if(!name||!fields.length){alert("ใส่ชื่อเทมเพลตและฟิลด์อย่างน้อย 1 รายการ");return}try{const r=push(dbref(`rooms/${roomId}/game/sheetTemplates`));await set(r,{name,fields,createdAt:Date.now(),createdBy:me.uid});$("templateName").value="";$("templateFields").value="";$("sheetTemplateSelect").value=r.key;renderTemplateOptions();$("sheetTemplateSelect").value=r.key;renderCustomFields();status("สร้างเทมเพลตแล้ว")}catch(e){alert("สร้างเทมเพลตไม่ได้: "+errorText(e))}}
 function renderMessages(data){const host=$("messages");host.replaceChildren();const entries=Object.entries(data).sort((a,b)=>(a[1]?.createdAt||0)-(b[1]?.createdAt||0)).slice(-80);if(!entries.length){const p=document.createElement("p");p.className="muted";p.textContent="ยังไม่มีข้อความ";host.append(p);return}for(const [,m] of entries){const box=document.createElement("div");box.className="message";const meta=document.createElement("div");meta.className="meta";const time=m.createdAt?new Date(m.createdAt).toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"}):"";meta.textContent=`${m.displayName||"ผู้เล่น"} • ${time}`;const body=document.createElement("div");body.className="body";body.textContent=safeText(m.text);box.append(meta,body);host.append(box)}host.scrollTop=host.scrollHeight}
-async function sendChat(value){const text=value.trim().slice(0,500);if(!text||!roomId)return;await push(dbref(`rooms/${roomId}/game/chat`),{uid:me.uid,displayName:myName,text,kind:"chat",createdAt:Date.now()})}async function rollDice(sides){const result=Math.floor(Math.random()*sides)+1;$("diceResult").textContent=`d${sides} → ${result}`;try{await push(dbref(`rooms/${roomId}/game/chat`),{uid:me.uid,displayName:myName,text:`ทอย d${sides} ได้ ${result}`,kind:"dice",createdAt:Date.now()})}catch(e){status("บันทึกผลทอยไม่ได้: "+errorText(e))}}
-function compressImage(file){return new Promise((resolve,reject)=>{if(!/^image\/(png|jpeg|webp)$/.test(file.type)){reject(Error("รองรับเฉพาะ PNG, JPG และ WebP"));return}const image=new Image(),reader=new FileReader();reader.onerror=()=>reject(Error("อ่านไฟล์ภาพไม่ได้"));reader.onload=()=>{image.onload=()=>{let w=image.naturalWidth,h=image.naturalHeight;const scale=Math.min(1,1600/Math.max(w,h));w=Math.round(w*scale);h=Math.round(h*scale);const c=document.createElement("canvas");c.width=w;c.height=h;const ctx=c.getContext("2d");ctx.fillStyle="#fff";ctx.fillRect(0,0,w,h);ctx.drawImage(image,0,0,w,h);let q=.82,data=c.toDataURL("image/jpeg",q);while(data.length>880000&&q>.35){q-=.08;data=c.toDataURL("image/jpeg",q)}if(data.length>880000){reject(Error("ไฟล์ยังใหญ่เกินไป ลองใช้ภาพที่เล็กลง"));return}resolve(data)};image.onerror=()=>reject(Error("ไฟล์ภาพไม่ถูกต้อง"));image.src=reader.result};reader.readAsDataURL(file)})}
+async function sendChat(value){const text=value.trim().slice(0,500);if(!text||!roomId)return;await push(dbref(`rooms/${roomId}/game/chat`),{uid:me.uid,displayName:myName,text,kind:"chat",createdAt:Date.now()})}
+  let diceRolling = false;
+async function rollDice(sides) {
+  if (!roomId || !me || diceRolling) return;
+const quantityInput = $("diceQuantity");
+  const modifierInput = $("diceModifier");
+  const resultEl = $("diceResult");
+  const buttons = $("diceButtons").querySelectorAll("button");
+const quantity = Number(quantityInput.value);
+  const modifier = Number(modifierInput.value);
+if (!Number.isInteger(quantity) || quantity < 1 || quantity > 100) {
+    alert("จำนวนลูกเต๋าต้องอยู่ระหว่าง 1 ถึง 100");
+    return;
+  }
+if (
+    !Number.isInteger(modifier) ||
+    modifier < -9999 ||
+    modifier > 9999
+  ) {
+    alert("Modifier ต้องเป็นจำนวนเต็มระหว่าง -9999 ถึง 9999");
+    return;
+  }
+// สุ่มผลเต๋าแต่ละลูก
+  const rolls = Array.from(
+    { length: quantity },
+    () => Math.floor(Math.random() * sides) + 1
+  );
+const diceTotal = rolls.reduce((sum, value) => sum + value, 0);
+  const total = diceTotal + modifier;
+  const modifierText = modifier > 0 ? `+${modifier}` : `${modifier}`;
+const formula =
+    `${quantity}d${sides} ${modifier >= 0 ? "+" : "-"} ${Math.abs(modifier)}`;
+// ป้องกันการกดทอยซ้ำระหว่างรอ
+  diceRolling = true;
+  buttons.forEach(button => button.disabled = true);
+  quantityInput.disabled = true;
+  modifierInput.disabled = true;
+  resultEl.classList.add("rolling");
+  resultEl.textContent = `🎲 กำลังทอย ${formula} ...`;
+try {
+    // รอลุ้น 3 วินาที
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    const message =
+      `🎲 ทอย ${formula}\n` +
+      `ผลเต๋า: ${rolls.join(" + ")} = ${diceTotal}\n` +
+      `Modifier: ${modifierText}\n` +
+      `ผลรวมสุดท้าย: ${total}`;
+// แสดงผลบนหน้าจอ
+  resultEl.classList.remove("rolling");
+    resultEl.textContent =
+      `ผลเต๋า: ${rolls.join(" + ")} = ${diceTotal}\n` +
+      `Modifier: ${modifierText}\n` +
+      `รวม: ${total}`;
+// ส่งผลทอยเข้าแชตของห้อง
+    await push(dbref(`rooms/${roomId}/game/chat`), {
+      uid: me.uid,
+      displayName: myName,
+      text: message,
+      kind: "dice",
+      createdAt: Date.now()
+    });
+} catch (e) {
+    resultEl.classList.remove("rolling");
+    status("บันทึกผลทอยไม่ได้: " + errorText(e));
+} finally {
+    diceRolling = false;
+    buttons.forEach(button => button.disabled = false);
+    quantityInput.disabled = false;
+    modifierInput.disabled = false;
+  }
+}
+  function rorTextunction compressImage(file){return new Promise((resolve,reject)=>{if(!/^image\/(png|jpeg|webp)$/.test(file.type)){reject(Error("รองรับเฉพาะ PNG, JPG และ WebP"));return}const image=new Image(),reader=new FileReader();reader.onerror=()=>reject(Error("อ่านไฟล์ภาพไม่ได้"));reader.onload=()=>{image.onload=()=>{let w=image.naturalWidth,h=image.naturalHeight;const scale=Math.min(1,1600/Math.max(w,h));w=Math.round(w*scale);h=Math.round(h*scale);const c=document.createElement("canvas");c.width=w;c.height=h;const ctx=c.getContext("2d");ctx.fillStyle="#fff";ctx.fillRect(0,0,w,h);ctx.drawImage(image,0,0,w,h);let q=.82,data=c.toDataURL("image/jpeg",q);while(data.length>880000&&q>.35){q-=.08;data=c.toDataURL("image/jpeg",q)}if(data.length>880000){reject(Error("ไฟล์ยังใหญ่เกินไป ลองใช้ภาพที่เล็กลง"));return}resolve(data)};image.onerror=()=>reject(Error("ไฟล์ภาพไม่ถูกต้อง"));image.src=reader.result};reader.readAsDataURL(file)})}
 async function saveMap(src,kind){if(myRole!=="dm"){alert("เฉพาะ DM เท่านั้นที่เปลี่ยนแผนที่ได้");return}const {cols,rows}=dimensions();try{await set(dbref(`rooms/${roomId}/game/map`),{src,kind,gridCols:cols,gridRows:rows,updatedAt:Date.now(),updatedBy:me.uid});status("บันทึกแผนที่แล้ว ทุกคนในห้องจะเห็นแผนที่เดียวกัน")}catch(e){alert("บันทึกแผนที่ไม่สำเร็จ: "+errorText(e)+"\nหากเป็น permission denied ให้ตรวจ Firebase Rules")}}
 $("saveNameBtn").onclick=()=>{const n=$("displayName").value.trim().slice(0,30);if(!n){alert("กรุณาใส่ชื่อ");return}myName=n;localStorage.setItem("easydnd_name",n);show("loginPanel",false);show("homePanel",true);status(`สวัสดี ${myName}`)};$("createRoomBtn").onclick=createRoom;$("joinRoomBtn").onclick=joinRoom;$("enterGameBtn").onclick=enterGame;$("leaveRoomBtn").onclick=resetHome;$("backRoomBtn").onclick=()=>openRoom(roomId,roomInfo,myRole,false);$("copyCodeBtn").onclick=async()=>{try{await navigator.clipboard.writeText(roomId);status("คัดลอกรหัสห้องแล้ว")}catch{alert("รหัสห้อง: "+roomId)}};$("diceButtons").addEventListener("click",e=>{const b=e.target.closest("button[data-die]");if(b&&roomId)rollDice(Number(b.dataset.die))});$("chatForm").addEventListener("submit",async e=>{e.preventDefault();const input=$("chatInput");try{await sendChat(input.value);input.value=""}catch(err){alert("ส่งข้อความไม่ได้: "+errorText(err))}});
 $("mapFile").addEventListener("change",async e=>{const file=e.target.files?.[0];if(!file)return;if(file.size>12*1024*1024){alert("ไฟล์ต้นฉบับใหญ่เกิน 12 MB กรุณาย่อภาพก่อน");e.target.value="";return}const b=e.target; b.disabled=true;status("กำลังย่อและบันทึกภาพแผนที่…");try{const data=await compressImage(file);await saveMap(data,"upload")}catch(err){alert(err.message||String(err))}finally{b.disabled=false;e.target.value=""}});
