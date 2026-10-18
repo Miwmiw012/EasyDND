@@ -63,4 +63,58 @@
     </button>
   </main>
 </body>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+  import {
+    getAuth,
+    signInAnonymously,
+    onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+  import {
+    getDatabase,
+    ref,
+    get
+  } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyApLGFjitTleBjPCbaHgL2QZ1Bxdw2uYlY",
+    authDomain: "easydnd-1ab42.firebaseapp.com",
+    databaseURL: "https://easydnd-1ab42-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "easydnd-1ab42",
+    storageBucket: "easydnd-1ab42.firebasestorage.app",
+    messagingSenderId: "755955885657",
+    appId: "1:755955885657:web:5aceef5392db3b98673348",
+    measurementId: "G-JVV8WY0BXT"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getDatabase(app);
+
+  const status = document.querySelector(".status");
+
+  async function startFirebase() {
+    if (status) status.textContent = "กำลังเชื่อมต่อ Firebase...";
+
+    try {
+      await signInAnonymously(auth);
+
+      if (status) {
+        status.textContent = "✓ เชื่อมต่อ Firebase และเข้าสู่ระบบแล้ว";
+      }
+
+      console.log("Firebase connected. UID:", auth.currentUser.uid);
+    } catch (error) {
+      console.error("Firebase error:", error);
+
+      if (status) {
+        status.textContent = "เชื่อมต่อไม่สำเร็จ: " + error.code;
+      }
+    }
+  }
+
+  startFirebase();
+</script>
+</body>
+
 </html>
