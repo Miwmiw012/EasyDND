@@ -102,7 +102,7 @@ By MZNR
       await signInAnonymously(auth);
 
       if status.textContent =
-  "✓ เชื่อมต่อ Firebase แล้ว\nรหัสผู้เล่น: " + auth.currentUser.uid;
+  "✓ หน้าเว็บพร้อมใช้งาน\nรหัสผู้เล่น: " + auth.currentUser.uid;
 
       console.log("Firebase connected. UID:", auth.currentUser.uid);
     } catch (error) {
