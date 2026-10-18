@@ -1,6 +1,7 @@
 # EasyDND
 By MZNR
 
+
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -101,8 +102,8 @@ By MZNR
     try {
       await signInAnonymously(auth);
 
-      if status.textContent =
-  "✓ หน้าเว็บพร้อมใช้งาน\nรหัสผู้เล่น: " + auth.currentUser.uid;
+      if (status).textContent =
+  "✓ เชื่อมต่อ Firebase แล้ว\nรหัสผู้เล่น: " + auth.currentUser.uid;
 
       console.log("Firebase connected. UID:", auth.currentUser.uid);
     } catch (error) {
@@ -120,4 +121,3 @@ By MZNR
 
 </html>
 
-    
