@@ -99,7 +99,7 @@
     try {
       await signInAnonymously(auth);
 
-      if status.textContent =
+      if (status).textContent =
   "✓ เชื่อมต่อ Firebase แล้ว\nรหัสผู้เล่น: " + auth.currentUser.uid;
 
       console.log("Firebase connected. UID:", auth.currentUser.uid);
